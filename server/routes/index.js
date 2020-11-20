@@ -3,7 +3,7 @@ const db = require('../db');
 const _ = require('lodash');
 const router = express.Router();
 
-router.post('/bad/user', async (req, res, next) => {
+router.post('/bad/sql', async (req, res, next) => {
   try {
     var result = await db.selectUserBadWay({body: req.body});
 
@@ -16,7 +16,7 @@ router.post('/bad/user', async (req, res, next) => {
   }
 });
 
-router.post('/good/user', async (req, res, next) => {
+router.post('/good/sql', async (req, res, next) => {
   try {
     var result = await db.selectUserGoodWay({body: req.body});
 
