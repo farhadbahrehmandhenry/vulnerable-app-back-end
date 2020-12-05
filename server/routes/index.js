@@ -55,34 +55,30 @@ router.post('/bad/os/injection', async (req, res, next) => {
 });
 
 router.post('/good/os/injection', async (req, res, next) => {
-  var start, end;
+  var start = new Date().getTime();
+  var {fileName} = req.body;
+  if (!/[;]/g.test(fileName)) {
+    try {
+      exec(`touch ${fileName}`, (error, stdout, stderr) => {
+          if (error !== null) {
+              console.log('exec error: ' + error);
+          }
+          else {
+            var end = new Date().getTime();
   
-  start = new Date().getTime();
-
-  try {
-    exec(`touch ${req.body.fileName}`, (error, stdout, stderr) => {
-        if (error !== null) {
-            console.log('exec error: ' + error);
-        }
-        else {
-          end = new Date().getTime();
-
-          res.json({type: 'success', fileName: req.body.fileName});
-        }
-    });
+            res.json({type: 'success', fileName: req.body.fileName, time: end - start});
+          }
+      });
+    }
+    catch(e) {
+      console.log(e)
+  
+      res.sendStatus(500);
+    }
   }
-  catch(e) {
-    console.log(e)
-
-    res.sendStatus(500);
+  else {
+    res.json({type: 'fail', fileName: 'injection', time: 0});
   }
-
-  console.log(start, end)
-
 });
-
-
-
-
 
 module.exports = router;
