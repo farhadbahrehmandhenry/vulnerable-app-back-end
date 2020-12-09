@@ -18,6 +18,17 @@ router.post('/bad/sql', async (req, res, next) => {
   }
 });
 
+router.get('/send-money', async (req, res, next) => {
+  try {
+    res.send({message: 'money sent'});
+  }
+  catch(e) {
+    console.log(e)
+
+    res.sendStatus(500);
+  }
+});
+
 router.post('/good/sql', async (req, res, next) => {
   try {
     var result = await db.selectUserGoodWay({body: req.body});
