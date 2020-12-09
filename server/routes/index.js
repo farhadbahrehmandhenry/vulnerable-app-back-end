@@ -3,6 +3,7 @@ const db = require('../db');
 const _ = require('lodash');
 const router = express.Router();
 const {exec} = require('child_process');
+var jwt = require('jsonwebtoken');
 
 
 router.post('/bad/sql', async (req, res, next) => {
@@ -21,6 +22,45 @@ router.post('/bad/sql', async (req, res, next) => {
 router.get('/send-money', async (req, res, next) => {
   try {
     res.send({message: 'money sent'});
+  }
+  catch(e) {
+    console.log(e)
+
+    res.sendStatus(500);
+  }
+});
+
+router.post('/bad/deserialization', async (req, res, next) => {
+  try {
+    // var token = jwt.sign({userName: "_$$ND_FUNC$$_function (){ return 'hacked!!!!'; }()", password: "London"}, 'deserialization');
+
+    var deserialized = jwt.verify(req.body.token, 'deserialization');
+
+    if (deserialized) {
+      res.json({deserialized, serialized: req.body.token});
+    }
+    else {
+      res.json({type: 'fail', fileName: 'token not valid', time: 0});
+    }
+  }
+  catch(e) {
+    console.log(e)
+
+    res.sendStatus(500);
+  }
+});
+
+router.post('/good/deserialization', async (req, res, next) => {
+  try {
+    var deserialized = jwt.verify(req.body.token, 'deserialization');
+
+    if (/[;()=><]/g.test(deserialized.userName) || /[;]/g.test(deserialized.password)) {
+      // res.json({type: 'fail', fileName: 'token not valid', time: 0});
+      res.json({deserialized: {userName: 'injection', password: 'injection'}, serialized: req.body.token});
+    }
+    else {
+      res.json({deserialized, serialized: req.body.token});
+    }
   }
   catch(e) {
     console.log(e)
